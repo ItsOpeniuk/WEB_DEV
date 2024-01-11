@@ -117,7 +117,19 @@ def walker(main_dir, dirs_paths):
     
     return known_ext, unknown_ext, sorted_files
 
-
+def input_error(func):
+    def wrapper(*args):
+        try:
+            return func(*args)
+        except KeyError:
+            return "Contact not found."
+        except IndexError:
+            return "Contact"
+        except TypeError:
+            return "Invalid input. Please check your input."
+    return wrapper
+    
+@input_error
 def sorter():
     path_dir = input("Enter path to Directoy: ")
 
@@ -150,6 +162,7 @@ def sorter():
     print(f'\nKnown extensions: {", ".join(known_ext)}')
     if unknown_ext:
         print(f'Unknown extensions: {", ".join(unknown_ext)}')
+
 
 
 if __name__ == '__main__':
