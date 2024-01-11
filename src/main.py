@@ -204,7 +204,7 @@ def main():
                 args = user_input[len(command):].split()
                 res = COMMANDS[command](*args)
                 print(res) if res is not None else ...
-                
+                break
         else:
             print("Unknown command. Please try again.")
 
