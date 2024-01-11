@@ -124,7 +124,7 @@ def sorter():
     # Перевірка path_dir на директорію
     if not os.path.isdir(path_dir):
         print(f'Directory {path_dir} does not exist.')
-        exit(1)
+        return
 
     # Зміна робочої директорії
     os.chdir(path_dir)
