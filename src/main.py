@@ -97,7 +97,6 @@ DEFAULT_FILE = "new_book.csv"
 def handle_open(csv_file=None):
     global ADDRESS_BOOK, DEFAULT_FILE
     if csv_file is None:
-        # Якщо файл не вказаний, відкриваємо файл за замовченням
         csv_file = DEFAULT_FILE
     try:
         ADDRESS_BOOK = AddressBook(csv_file)
@@ -128,7 +127,6 @@ def handle_save(csv_file=None):
         ADDRESS_BOOK.csv_file = csv_file
         ADDRESS_BOOK.save_to_disk()
         return f"Address book saved to {ADDRESS_BOOK.csv_file}"
-
 
 
 def show_help():
@@ -196,8 +194,7 @@ def main():
         for command in COMMANDS.keys():
             if user_input.startswith(command):
                 args = user_input[len(command):].split()
-                res = COMMANDS[command](*args)
-                print(res) if res is not None else ...
+                print(COMMANDS[command](*args))
                 break
         else:
             print("Unknown command. Please try again.")
