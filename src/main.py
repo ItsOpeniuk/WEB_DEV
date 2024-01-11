@@ -194,7 +194,8 @@ def main():
         for command in COMMANDS.keys():
             if user_input.startswith(command):
                 args = user_input[len(command):].split()
-                print(COMMANDS[command](*args))
+                res = COMMANDS[command](*args)
+                print(res) if res is not None else ...
                 break
         else:
             print("Unknown command. Please try again.")
