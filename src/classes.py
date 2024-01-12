@@ -1,6 +1,7 @@
 from collections import UserDict
 from datetime import date, datetime
 import csv
+import re
 
 
 class Field:
@@ -45,11 +46,18 @@ class Birthday(Field):
             return False
 
 
+class Email(Field):
+    def is_valid_format(self, value):
+        pattern = r'^[a-zA-Z]+[\w.-]+[@][a-zA-Z]+[.][a-zA-Z][a-zA-Z]+$'
+        return re.match(pattern, value) is not None
+
+
 class Record:
     def __init__(self, name):
         self.name = Name(name)
         self.phones = []
         self.birthday = None
+        self.email = None
 
     def add_phone(self, phone):
         new_phone = Phone(phone)
@@ -61,10 +69,28 @@ class Record:
         else:
             self.birthday = Birthday(birthday)
 
+    def set_email(self, email):
+        if self.email is not None:
+            raise ValueError("Email already set for this contact")
+        else:
+            self.email = Email(email)
+
     def remove_phone(self, phone):
         for ph in self.phones:
             if ph.value == phone:
                 self.phones.remove(ph)
+
+    def remove_birthday(self):
+        self.birthday = None
+
+    def change_birthday(self, bir):
+        self.birthday = Birthday(bir)
+
+    def remove_email(self):
+        self.email = None
+
+    def change_email(self, email):
+        self.email = Email(email)
 
     def edit_phone(self, old_phone, new_phone):
         if any(p.value == old_phone for p in self.phones):
@@ -93,7 +119,7 @@ class Record:
 
     def __str__(self):
         phones_str = "; ".join(str(phone) for phone in self.phones)
-        return f"Contact name: {self.name}, phones: {phones_str}, birthday: {self.birthday}"
+        return f"Contact name: {self.name}, phones: {phones_str}, birthday: {self.birthday}, email: {self.email}"
 
 
 class AddressBook(UserDict):
@@ -146,7 +172,7 @@ class AddressBook(UserDict):
 
     def save_to_disk(self):
         with open(self.csv_file, 'w', newline='') as file:
-            field = ["Name", "Phones", "Birthday"]
+            field = ["Name", "Phones", "Birthday", "Email"]
             writer = csv.DictWriter(file, fieldnames=field)
             writer.writeheader()
             # Записуємо дані
@@ -155,7 +181,8 @@ class AddressBook(UserDict):
                 writer.writerow({
                     "Name": name,
                     "Phones": phones_str,
-                    "Birthday": str(record.birthday) if record.birthday else "None"
+                    "Birthday": str(record.birthday) if record.birthday else "None",
+                    "Email": str(record.email) if record.email else "None"
                 })
 
     def read_from_file(self):
@@ -168,4 +195,6 @@ class AddressBook(UserDict):
                     record.add_phone(phone)
                 if row["Birthday"] != "None":
                     record.set_birthday(row["Birthday"])
+                if row["Email"] != "None":
+                    record.set_email(row["Email"])
                 self.add_record(record)
