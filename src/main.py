@@ -30,6 +30,33 @@ def handle_add(name, phone):
         try:
             record.add_phone(phone)
             ADDRESS_BOOK.add_record(record)
+
+            answer = input("Would you add birthday or email? (Y/N) - ").lower()
+            if answer == "y":
+                data = input("Enter your data separated by space: ").split()
+
+                if len(data) == 2:
+                    email, birthday = data
+                    if "@" in email and birthday.count(".") == 2:
+                        handle_set_email(name, email)
+                        handle_set_birthday(name, birthday)
+                        return f"Contact {name} added with phone number {phone}, birthday {birthday}, email {email}"
+                    elif "@" in birthday and email.count(".") == 2:
+                        handle_set_email(name, birthday)
+                        handle_set_birthday(name, email)
+                        return f"Contact {name} added with phone number {phone}, birthday {birthday}, email {email}"
+                elif len(data) == 1:
+                    if "@" in data[0]:
+                        handle_set_email(name, data[0])
+                        return f"Contact {name} added with phone number {phone}, email {data[0]}"
+                    elif data[0].count(".") == 2:
+                        handle_set_birthday(name, data[0])
+                        return f"Contact {name} added with phone number {phone}, birthday {data[0]}"
+                
+                print("Invalid input.")
+            elif answer != "n":
+                print("Invalid input.")
+            
             return f"Contact {name} added with phone number {phone}"
         except ValueError:
             return "Invalid phone"
