@@ -12,7 +12,7 @@ def input_error(func):
         except KeyError:
             return "Contact not found."
         except IndexError:
-            return "Contact"
+            return "Data is already set for this contact"
         except TypeError:
             return "Invalid input. Please check your input."
     return wrapper
@@ -77,8 +77,8 @@ def handle_set_email(name, email):
         try:
             record.set_email(email)
             return f"Email for contact {name} is set as {email}"
-        except ValueError:
-            return "Invalid email"
+        except IndexError:
+            return "Email is already set for this contact, use the 'change' command"
     else:
         raise KeyError
 
@@ -92,6 +92,8 @@ def handle_set_birthday(name, day):
             return f"Birthday for contact {name} is set to {day}"
         except ValueError:
             return "Please enter the date in DD.MM.YYYY format."
+        except IndexError:
+            return "Birthday is already set for this contact, use the 'change' command"
     else:
         raise KeyError
 
@@ -130,7 +132,9 @@ def handle_remove(name, remove):
                 record.remove_phone(remove)
                 return f"{remove} for {name} deleted"
             except ValueError:
-                return "Invalid input."
+                return f"Phone number {remove} for contact {name} not found."
+            except IndexError:
+                return "You cannot delete a single phone number, add another one or use the command 'change'"
     else:
         raise KeyError
 
@@ -206,6 +210,7 @@ def show_help():
         sort: Сортує необхідну папку.
         """
     return help_message
+
 
 COMMANDS = {
     "help": show_help,
