@@ -224,7 +224,7 @@ COMMANDS = {
     "sort": sorter
 }
 
-command_list = ['help', 'hello', 'save', 'add', 'change', 'remove',
+command_list = ['help', 'hello', 'save', 'add', 'change birthday', "change email", "change phone", 'remove',
                 'info', 'show all', 'set birthday', "set email", 'days to birthday',
                 'delete', 'search', 'sort']
 
