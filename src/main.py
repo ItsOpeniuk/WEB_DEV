@@ -3,7 +3,7 @@ from sorter import sorter
 from prompt_toolkit import prompt
 from prompt_toolkit.completion import FuzzyWordCompleter
 from prompt_toolkit.styles import Style
-
+from prettytable import PrettyTable
 
 def input_error(func):
     def wrapper(*args):
@@ -192,8 +192,8 @@ def handle_save():
 
 
 def show_help():
+
     help_message = """
-        Доступні команди:
         hello: Вивести вітальне повідомлення.
         save: Зберегти адресну книгу.
         add [іʼмя] [телефон]: Додати новий контакт до адресної книги.
@@ -209,7 +209,18 @@ def show_help():
         search [запит]: Пошук в адресній книзі за символами.
         sort: Сортує необхідну папку.
         """
-    return help_message
+
+    commands = [line.strip() for line in help_message.split('\n') if line.strip()]
+    tabele = PrettyTable(['Доступні команди', 'Опис'])
+    tabele.align['Доступні команди'] = 'l'
+    tabele.align['Опис'] = 'l'
+
+    for command in commands:
+        command_parts = command.split(':', 1)
+        if len(command_parts) == 2:
+            tabele.add_row([command_parts[0].strip(), command_parts[1].strip()])
+
+    return tabele
 
 
 COMMANDS = {
