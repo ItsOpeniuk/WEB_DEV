@@ -224,8 +224,8 @@ COMMANDS = {
     "sort": sorter
 }
 
-command_list = ['help', 'hello', 'open', 'save', 'add', 'change',
-                'info', 'show all', 'set birthday', 'days to birthday',
+command_list = ['help', 'hello', 'save', 'add', 'change', 'remove',
+                'info', 'show all', 'set birthday', "set email", 'days to birthday',
                 'delete', 'search', 'sort']
 
 custom_style = Style.from_dict({
