@@ -65,20 +65,23 @@ class Record:
 
     def set_birthday(self, birthday):
         if self.birthday is not None:
-            raise ValueError("Birthday already set for this contact")
+            raise IndexError 
         else:
             self.birthday = Birthday(birthday)
 
     def set_email(self, email):
         if self.email is not None:
-            raise ValueError("Email already set for this contact")
+            raise IndexError 
         else:
             self.email = Email(email)
 
     def remove_phone(self, phone):
-        for ph in self.phones:
-            if ph.value == phone:
-                self.phones.remove(ph)
+        if len(self.phones) > 1:
+            for ph in self.phones:
+                if ph.value == phone:
+                    self.phones.remove(ph)
+        else:
+            raise IndexError
 
     def remove_birthday(self):
         self.birthday = None
