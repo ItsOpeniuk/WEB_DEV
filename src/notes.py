@@ -10,7 +10,7 @@ class Note:
         self.title = data[1]
         self.note = data[2]
         self.tags = ", ".join(data[3:]) if len(data) > 3 else None
-        self.date = datetime.now().strftime("%d.%m.%Y, %H:%M") if date is None else date
+        self.date = datetime.now().strftime("%d.%m.%Y,%H:%M") if date is None else date
 
     def change_note(self, field, new_data):
         fields_mapping = {
@@ -24,9 +24,11 @@ class Note:
         if field in fields_mapping:
             if field == 'date':
                 # Перевірка є тільки на формат дати
-                date_pattermn = re.compile(r"^(0[1-9]|[12][0-9]|3[01])\.(0[1-9]|1[012])\.\d{4}, (0[0-9]|1[0-9]|2[0-3]):([0-5][0-9])$")
+                date_pattermn = re.compile(
+                    r"^(0[1-9]|[12][0-9]|3[01])\.(0[1-9]|1[012])\.\d{4},(0[0-9]|1[0-9]|2[0-3]):([0-5][0-9])$")
                 if not date_pattermn.math(new_data):
-                    raise ValueError("Invalid date format. Should be DD.MM.YYYY, HH:MM")
+                    raise ValueError(
+                        "Invalid date format. Should be DD.MM.YYYY,HH:MM")
             setattr(self, fields_mapping[field], new_data)
         else:
             print(f"Invalid field: {field}")
@@ -38,8 +40,11 @@ class Note:
 
 class NoteManager:
 
-    def __init__(self):
+    def __init__(self, csv_file=None):
+        self.csv_file = csv_file
         self.notes = []
+        if csv_file is not None:
+            self.load_notes()
 
     def add_note(self, note):
         self.notes.append(note)
@@ -66,7 +71,7 @@ class NoteManager:
                 result.append(note)
         return result
 
-    def search_notes_by_tags(self, search_tags:str):
+    def search_notes_by_tags(self, search_tags: str):
         # Користувач вводить через кому теги, ця функція їх розбиває на список
         # і для кожного тегу провводить пошук по нотатках
         search_tag_list = [x.strip() for x in search_tags.split(",")]
@@ -76,7 +81,6 @@ class NoteManager:
                 if tag in note.tags:
                     result.add(note)
         return result
-            
 
     def save_notes(self):
         with open("notes_save.csv", "w", newline='') as fd:
