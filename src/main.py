@@ -251,9 +251,9 @@ def handle_add_note(*args):
     else:
         text = " ".join(args[2:])
         if text.endswith("."):
-            data = [args[0], args[1], text[:text.find(".")]]
+            data = [args[0], args[1], text[:text.rfind(".")]]
         else:
-            data = [args[0], args[1], text[:text.find(".")], args[-1]]
+            data = [args[0], args[1], text[:text.rfind(".")], args[-1]]
 
         note = Note(*data)
         NOTES_MANAGER.add_note(note)
