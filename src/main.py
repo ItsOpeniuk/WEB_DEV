@@ -241,22 +241,22 @@ def handle_add_note(*args):
     if len(args) < 3:
         return "Not enough arguments. At least author, title and note"
     title = args[1]
-    all_notes = NOTES_MANAGER.notes
-    for el in all_notes:
-        note_title = el.title
-        if title == note_title:
+    for note in NOTES_MANAGER.notes:
+        if note.title == title:
             print("its note is exist")
             break
-
     else:
         text = " ".join(args[2:])
         if text.endswith("."):
             data = [args[0], args[1], text[:text.rfind(".")]]
+            note = Note(*data)
+            NOTES_MANAGER.add_note(note)
         else:
             data = [args[0], args[1], text[:text.rfind(".")], args[-1]]
-
-        note = Note(*data)
-        NOTES_MANAGER.add_note(note)
+            note = Note(*data)
+            NOTES_MANAGER.add_note(note)
+    
+        
 
 
 @input_error

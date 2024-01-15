@@ -5,7 +5,7 @@ import re
 
 class Note:
 
-    def __init__(self, *data):
+    def __init__(self, *data, date=None):
         self.author = data[0]
         self.title = data[1]
         self.note = data[2]
