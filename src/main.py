@@ -243,21 +243,20 @@ def handle_add_note(*args):
     title = args[1]
     all_notes = NOTES_MANAGER.notes
     for el in all_notes:
-        print(el)
         note_title = el.title
         if title == note_title:
             print("its note is exist")
             break
 
     else:
-        if "." in args[-1]:
-            date = args[-1]
-            args = args[:-1]
+        text = " ".join(args[2:])
+        if text.endswith("."):
+            data = [args[0], args[1], text[:text.find(".")]]
         else:
-            date = None
+            data = [args[0], args[1], text[:text.find(".")], args[-1]]
 
-            note = Note(*args, date=date)
-            NOTES_MANAGER.add_note(note)
+        note = Note(*data)
+        NOTES_MANAGER.add_note(note)
 
 
 @input_error

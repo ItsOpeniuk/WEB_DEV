@@ -5,12 +5,12 @@ import re
 
 class Note:
 
-    def __init__(self, *data, date=None):
+    def __init__(self, *data):
         self.author = data[0]
         self.title = data[1]
         self.note = data[2]
-        self.tags = ", ".join(data[3:]) if len(data) > 3 else None
-        self.date = datetime.now().strftime("%d.%m.%Y,%H:%M") if date is None else date
+        self.tags = data[3] if len(data) > 3 else None
+        self.date = datetime.now().strftime("%d.%m.%Y,%H:%M")
 
     def change_note(self, field, new_data):
         fields_mapping = {
