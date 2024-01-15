@@ -1,3 +1,4 @@
+from prettytable import PrettyTable
 from collections import UserDict
 from datetime import date, datetime
 import csv
@@ -143,19 +144,29 @@ class AddressBook(UserDict):
         results = []
         for name, record in self.data.items():
             if query.lower() in name.lower():
-                results.append(str(record))
+                results.append(record)
                 continue
             # Пошук за номерами телефону
             for phone in record.phones:
                 if query.lower() in phone.value.lower():
-                    results.append(str(record))
+                    results.append(record)
                     break
             # Пошук за днем народження
                 if record.birthday is not None:
                     birthday_str = str(record.birthday)
                     if query.lower() in birthday_str.lower():
-                        results.append(str(record))
-        return "\n".join(res for res in results)
+                        results.append(record)
+        table = PrettyTable(['name', 'phones', 'birthday', 'email'])
+        table.align = 'l'
+        for data in results:
+            phones = ''
+            for phone in data.phones:
+                if phone == data.phones[-1]:
+                    phones += str(phone)
+                else:
+                    phones += str(phone) + "\n"
+            table.add_row([data.name, phones, data.birthday, data.email])
+        return table
 
     def delete(self, name):
         if name in self.data:
