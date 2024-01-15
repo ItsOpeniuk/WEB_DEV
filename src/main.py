@@ -1,9 +1,11 @@
 from classes import Record, AddressBook
+from notes import NoteManager, Note
 from sorter import sorter
 from prompt_toolkit import prompt
 from prompt_toolkit.completion import FuzzyWordCompleter
 from prompt_toolkit.styles import Style
 from prettytable import PrettyTable
+
 
 def input_error(func):
     def wrapper(*args):
@@ -52,11 +54,11 @@ def handle_add(name, phone):
                     elif data[0].count(".") == 2:
                         handle_set_birthday(name, data[0])
                         return f"Contact {name} added with phone number {phone}, birthday {data[0]}"
-                
+
                 print("Invalid input.")
             elif answer != "n":
                 print("Invalid input.")
-            
+
             return f"Contact {name} added with phone number {phone}"
         except ValueError:
             return "Invalid phone"
@@ -194,28 +196,109 @@ def handle_search(query):
 @input_error
 def handle_open():
     global ADDRESS_BOOK
+    global NOTES_MANAGER
     csv_file = "new_book.csv"
+    csv_file_notes = "notes_save.csv"
     try:
         ADDRESS_BOOK = AddressBook(csv_file)
+        NOTES_MANAGER = NoteManager(csv_file_notes)
         return f"Address book opened from {csv_file}"
     except FileNotFoundError:
         ADDRESS_BOOK = AddressBook(None)
+        NOTES_MANAGER = NoteManager(None)
         return "Starting with an empty address book."
 
 
 @input_error
 def handle_save():
     global ADDRESS_BOOK
+    global NOTES_MANAGER
     csv_file = "new_book.csv"
+    csv_file_notes = "notes_save.csv"
     if ADDRESS_BOOK.csv_file is None:
-        # Якщо ADDRESS_BOOK створено без файлу, тобто AddressBook(None), то зберегти за замовченням
+        # Якщо ADDRESS_BOOK та NOTES_MANAGER створено без файлу, тобто AddressBook(None), то зберегти за замовченням
         ADDRESS_BOOK.csv_file = csv_file
         ADDRESS_BOOK.save_to_disk()
         return f"Address book saved to to {ADDRESS_BOOK.csv_file}"
+    elif NOTES_MANAGER.csv_file is None:
+        # Якщо NOTES_MANAGER створено без файлу, тобто NoteManager(None), то зберегти за замовченням
+        NOTES_MANAGER.csv_file = csv_file_notes
+        NOTES_MANAGER.save_notes()
     else:
-        # Якщо ADDRESS_BOOK має вказаний файл, то перезаписати його
+        # Якщо ADDRESS_BOOK та NOTES_MANAGER має вказаний файл, то перезаписати його
         ADDRESS_BOOK.save_to_disk()
-        return f"Address book saved to {ADDRESS_BOOK.csv_file}"
+        NOTES_MANAGER.save_notes()
+        return f"Address book and NOTES_MANAGER saved to {ADDRESS_BOOK.csv_file} , {NOTES_MANAGER.csv_file}"
+
+
+@input_error
+def handle_add_note(*args):
+    if len(args) < 3:
+        return "Not enough arguments. At least author, title and note"
+    title = args[1]
+    all_notes = NOTES_MANAGER.notes
+    for el in all_notes:
+        print(el)
+        note_title = el.title
+        if title == note_title:
+            print("its note is exist")
+            break
+
+    else:
+        if "." in args[-1]:
+            date = args[-1]
+            args = args[:-1]
+        else:
+            date = None
+
+            note = Note(*args, date=date)
+            NOTES_MANAGER.add_note(note)
+
+
+@input_error
+def handle_delete_note(title):
+    all_notes = NOTES_MANAGER.notes
+    match = None
+    for el in all_notes:
+        note_title = el.title
+        if title == note_title:
+            match = el
+            break
+    if match:
+        NOTES_MANAGER.remove_note(match)
+    else:
+        print("its note is exist")
+
+
+@input_error
+def handle_add_tags(*args):
+    title = args[0]
+    tags = " ".join(args[1:])
+    all_notes = NOTES_MANAGER.notes
+    match = None
+    for el in all_notes:
+        note_title = el.title
+        if title == note_title:
+            match = el
+            break
+    if match:
+        NOTES_MANAGER.add_tag(match, tags)
+
+
+@input_error
+def handle_search_note_by_tags(*args):
+    tags = ",".join(args)
+    return list(NOTES_MANAGER.search_notes_by_tags(tags))
+
+
+@input_error
+def handle_clear_notes():
+    NOTES_MANAGER.clear_notes()
+
+
+@input_error
+def show_all_notes():
+    NOTES_MANAGER.print_notes()
 
 
 def show_help():
@@ -235,9 +318,16 @@ def show_help():
         show all: Відобразити всі контакти в адресній книзі.
         search [запит]: Пошук в адресній книзі за символами.
         sort: Сортує необхідну папку.
+        add_note [Ім'я], [Назва], [Текст], [Тєг_1, Тєг_2...], [(DD.MM.YYYY,HH:MM)] : Додає нотатку
+        add_note_tags [Назва], [Тєг_1, Тєг_2...] : Додаває тегу до нотатків
+        show_all_notes : Показати усі нотатки
+        delete_note [Назва] : Видаляє нотатки
+        clear_notes : Видаляє усі нотатки
+        search_note_by_tags [Тєг_1, Тєг_2...] : Шукати по тєгам
         """
 
-    commands = [line.strip() for line in help_message.split('\n') if line.strip()]
+    commands = [line.strip()
+                for line in help_message.split('\n') if line.strip()]
     tabele = PrettyTable(['Доступні команди', 'Опис'])
     tabele.align['Доступні команди'] = 'l'
     tabele.align['Опис'] = 'l'
@@ -245,7 +335,8 @@ def show_help():
     for command in commands:
         command_parts = command.split(':', 1)
         if len(command_parts) == 2:
-            tabele.add_row([command_parts[0].strip(), command_parts[1].strip()])
+            tabele.add_row([command_parts[0].strip(),
+                           command_parts[1].strip()])
 
     return tabele
 
@@ -254,7 +345,6 @@ COMMANDS = {
     "help": show_help,
     "hello": handle_hello,
     "save": handle_save,
-    "add": handle_add,
     "set email": handle_set_email,
     "set birthday": handle_set_birthday,
     "days to birthday": days_to_birthday,
@@ -263,13 +353,19 @@ COMMANDS = {
     "info": handle_phone,
     "delete": handle_delete,
     "show all": handle_show_all,
+    "search_note_by_tags": handle_search_note_by_tags,
     "search": handle_search,
-    "sort": sorter
+    "sort": sorter,
+    "add_note_tags": handle_add_tags,
+    "add_note": handle_add_note,
+    "show_all_notes": show_all_notes,
+    "delete_note": handle_delete_note,
+    "clear_notes": handle_clear_notes
 }
 
 command_list = ['help', 'hello', 'save', 'add', 'change birthday', "change email", "change phone", 'remove',
                 'info', 'show all', 'set birthday', "set email", 'days to birthday',
-                'delete', 'search', 'sort']
+                'delete', "search_note_by_tags", 'search', 'sort', "add_note_tags", "add_note", "show_all_notes", "delete_note", "clear_notes"]
 
 custom_style = Style.from_dict({
     'prompt': 'bg:#708090 #ffffff',
@@ -288,6 +384,7 @@ def get_user_input():
 @input_error
 def main():
     global ADDRESS_BOOK
+    global NOTES_MANAGER
     handle_open()
 
     while True:
