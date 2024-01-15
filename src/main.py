@@ -240,24 +240,30 @@ def handle_save():
 
 
 @input_error
-def handle_add_note(*args):
-    if len(args) < 3:
-        return "Not enough arguments. At least author, title and note"
-    title = args[1]
+def handle_add_note(author, title):
     for note in NOTES_MANAGER.notes:
         if note.title == title:
-            print("its note is exist")
+            print("It's note is exist")
             break
-    else:
-        text = " ".join(args[2:])
-        if text.endswith("."):
-            data = [args[0], args[1], text[:text.rfind(".")]]
-            note = Note(*data)
-            NOTES_MANAGER.add_note(note)
-        else:
-            data = [args[0], args[1], text[:text.rfind(".")], args[-1]]
-            note = Note(*data)
-            NOTES_MANAGER.add_note(note)
+    text = input("write your text - ")
+    note = Note(author, title, text)
+    NOTES_MANAGER.add_note(note)
+    tag = input("Would you add tags? (Y/N) - ").lower()
+    if tag == "y":
+        data = input("Enter your data separated by space: ").lower()
+        a = data.split()
+        tags = " ".join(a)
+        all_notes = NOTES_MANAGER.notes
+        match = None
+        for el in all_notes:
+            note_title = el.title
+            if title == note_title:
+                match = el
+                break
+        if match:
+            NOTES_MANAGER.add_tag(match, tags)
+    elif tag != "n":
+        print("Invalid input.")
 
 
 @input_error
@@ -347,7 +353,7 @@ def show_help():
         show all: Відобразити всі контакти в адресній книзі.
         search [запит]: Пошук в адресній книзі за символами.
         sort: Сортує необхідну папку.
-        create note [Ім'я] [Назва] [Текст] [Тєг_1, Тєг_2...] : Додає нотатку
+        create note [Ім'я] [Назва] : Додає нотатку
         append note tags [Назва], [Тєг_1, Тєг_2...] : Додає тегу до нотатків
         showing all notes : Показати усі нотатки
         deletion note [Назва] : Видаляє нотатки
