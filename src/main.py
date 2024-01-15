@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from src.classes import Record, AddressBook
 from src.notes import NoteManager, Note
 from src.sorter import sorter
@@ -17,6 +19,7 @@ def input_error(func):
             return "Data is already set for this contact"
         except TypeError:
             return "Invalid input. Please check your input."
+
     return wrapper
 
 
@@ -255,8 +258,6 @@ def handle_add_note(*args):
             data = [args[0], args[1], text[:text.rfind(".")], args[-1]]
             note = Note(*data)
             NOTES_MANAGER.add_note(note)
-    
-        
 
 
 @input_error
@@ -290,9 +291,34 @@ def handle_add_tags(*args):
 
 
 @input_error
+def handle_show_birthday_list(date):
+    records = ADDRESS_BOOK.data
+    date_now = datetime.now().date()
+
+    try:
+        target_date = datetime.strptime(date, "%d.%m.%Y").date()
+    except ValueError:
+        return "Date not correct, please input in the format DD.MM.YYYY"
+
+    users_within_range = ""
+
+    for key, value in records.items():
+        try:
+            user_birthday = datetime.strptime(
+                str(value.birthday), "%d.%m.%Y").replace(year=date_now.year).date()
+
+            if date_now <= user_birthday <= target_date:
+                users_within_range += f"{value.name}'s birthday is on {value.birthday}" + "\n"
+        except ValueError:
+            continue
+
+    return users_within_range
+
+
+@input_error
 def handle_search_note_by_tags(*args):
     tags = ",".join(args)
-    return list(NOTES_MANAGER.search_notes_by_tags(tags))
+    return NOTES_MANAGER.search_notes_by_tags(tags)
 
 
 @input_error
@@ -306,7 +332,6 @@ def show_all_notes():
 
 
 def show_help():
-
     help_message = """
         hello: Вивести вітальне повідомлення.
         save: Зберегти адресну книгу.
@@ -323,11 +348,12 @@ def show_help():
         search [запит]: Пошук в адресній книзі за символами.
         sort: Сортує необхідну папку.
         create note [Ім'я] [Назва] [Текст] [Тєг_1, Тєг_2...] : Додає нотатку
-        apend note tags [Назва], [Тєг_1, Тєг_2...] : Додає тегу до нотатків
+        append note tags [Назва], [Тєг_1, Тєг_2...] : Додає тегу до нотатків
         showing all notes : Показати усі нотатки
         deletion note [Назва] : Видаляє нотатки
         clear notes : Видаляє усі нотатки
         searching note by tags [Тєг_1, Тєг_2...] : Шукати по тєгам
+        show birthday list [дата] : показати список днів народженя до певної дати
         """
 
     commands = [line.strip()
@@ -349,7 +375,7 @@ COMMANDS = {
     "help": show_help,
     "hello": handle_hello,
     "save": handle_save,
-    "add" : handle_add,
+    "add": handle_add,
     "set email": handle_set_email,
     "set birthday": handle_set_birthday,
     "days to birthday": days_to_birthday,
@@ -361,17 +387,18 @@ COMMANDS = {
     "searching note by tags": handle_search_note_by_tags,
     "search": handle_search,
     "sort": sorter,
-    "apend note tags": handle_add_tags,
+    "append note tags": handle_add_tags,
     "create note": handle_add_note,
     "showing all notes": show_all_notes,
     "deletion note": handle_delete_note,
-    "clear notes": handle_clear_notes
+    "clear notes": handle_clear_notes,
+    'show birthday list': handle_show_birthday_list
 }
 
 command_list = ['help', 'hello', 'save', 'add', 'change birthday', "change email", "change phone", 'remove',
                 'info', 'show all', 'set birthday', "set email", 'days to birthday',
-                'delete', "searching note by tags", 'search', 'sort', "apend note tags", "create note", "showing all notes", 
-                "deletion note", "clear notes"]
+                'delete', "searching note by tags", 'search', 'sort', "append note tags", "create note",
+                "showing all notes", "deletion note", "clear notes", 'show birthday list']
 
 custom_style = Style.from_dict({
     'prompt': 'bg:#708090 #ffffff',

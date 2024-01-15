@@ -1,3 +1,4 @@
+from prettytable import PrettyTable
 from datetime import datetime
 import csv
 import re
@@ -69,7 +70,11 @@ class NoteManager:
         for note in self.notes:
             if info in note.author or info in note.title or info in note.note or info in note.tags or info in note.date:
                 result.append(note)
-        return result
+        table = PrettyTable(['Author', 'Title', 'Note', 'Tags', 'Date'])
+        table.align = 'l'
+        for data in result:
+            table.add_row([data.author, data.title, data.note, data.tags, data.date])
+        print(table)
 
     def search_notes_by_tags(self, search_tags: str):
         # Користувач вводить через кому теги, ця функція їх розбиває на список
@@ -80,7 +85,11 @@ class NoteManager:
             for tag in search_tag_list:
                 if tag in note.tags:
                     result.add(note)
-        return result
+        table = PrettyTable(['Author', 'Title', 'Note', 'Tags', 'Date'])
+        table.align = 'l'
+        for data in result:
+            table.add_row([data.author, data.title, data.note, data.tags, data.date])
+        return table
 
     def save_notes(self):
         with open("notes_save.csv", "w", newline='') as fd:
@@ -118,9 +127,11 @@ class NoteManager:
         if not self.notes:
             print("No notes available.")
         else:
+            table = PrettyTable(['Author', 'Title', 'Note', 'Tags', 'Date'])
+            table.align = 'l'
             for note in self.notes:
-                print(note)
-
+                table.add_row([note.author, note.title, note.note, note.tags, note.date])
+            print(table)
 
 # note_manager = NoteManager()
 
