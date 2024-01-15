@@ -215,7 +215,12 @@ def handle_save():
     global NOTES_MANAGER
     csv_file = "new_book.csv"
     csv_file_notes = "notes_save.csv"
-    if ADDRESS_BOOK.csv_file is None:
+    if ADDRESS_BOOK.csv_file is None and NOTES_MANAGER.csv_file is None:
+        ADDRESS_BOOK.csv_file = csv_file
+        ADDRESS_BOOK.save_to_disk()
+        NOTES_MANAGER.csv_file = csv_file_notes
+        NOTES_MANAGER.save_notes()
+    elif ADDRESS_BOOK.csv_file is None:
         # Якщо ADDRESS_BOOK та NOTES_MANAGER створено без файлу, тобто AddressBook(None), то зберегти за замовченням
         ADDRESS_BOOK.csv_file = csv_file
         ADDRESS_BOOK.save_to_disk()
@@ -318,33 +323,34 @@ def show_help():
         show all: Відобразити всі контакти в адресній книзі.
         search [запит]: Пошук в адресній книзі за символами.
         sort: Сортує необхідну папку.
-        add_note [Ім'я], [Назва], [Текст], [Тєг_1, Тєг_2...], [(DD.MM.YYYY,HH:MM)] : Додає нотатку
-        add_note_tags [Назва], [Тєг_1, Тєг_2...] : Додаває тегу до нотатків
-        show_all_notes : Показати усі нотатки
-        delete_note [Назва] : Видаляє нотатки
-        clear_notes : Видаляє усі нотатки
-        search_note_by_tags [Тєг_1, Тєг_2...] : Шукати по тєгам
+        create note [Ім'я] [Назва] [Текст] [Тєг_1, Тєг_2...] : Додає нотатку
+        apend note tags [Назва], [Тєг_1, Тєг_2...] : Додає тегу до нотатків
+        showing all notes : Показати усі нотатки
+        deletion note [Назва] : Видаляє нотатки
+        clear notes : Видаляє усі нотатки
+        searching note by tags [Тєг_1, Тєг_2...] : Шукати по тєгам
         """
 
     commands = [line.strip()
                 for line in help_message.split('\n') if line.strip()]
-    tabele = PrettyTable(['Доступні команди', 'Опис'])
-    tabele.align['Доступні команди'] = 'l'
-    tabele.align['Опис'] = 'l'
+    table = PrettyTable(['Доступні команди', 'Опис'])
+    table.align['Доступні команди'] = 'l'
+    table.align['Опис'] = 'l'
 
     for command in commands:
         command_parts = command.split(':', 1)
         if len(command_parts) == 2:
-            tabele.add_row([command_parts[0].strip(),
+            table.add_row([command_parts[0].strip(),
                            command_parts[1].strip()])
 
-    return tabele
+    return table
 
 
 COMMANDS = {
     "help": show_help,
     "hello": handle_hello,
     "save": handle_save,
+    "add" : handle_add,
     "set email": handle_set_email,
     "set birthday": handle_set_birthday,
     "days to birthday": days_to_birthday,
@@ -353,19 +359,20 @@ COMMANDS = {
     "info": handle_phone,
     "delete": handle_delete,
     "show all": handle_show_all,
-    "search_note_by_tags": handle_search_note_by_tags,
+    "searching note by tags": handle_search_note_by_tags,
     "search": handle_search,
     "sort": sorter,
-    "add_note_tags": handle_add_tags,
-    "add_note": handle_add_note,
-    "show_all_notes": show_all_notes,
-    "delete_note": handle_delete_note,
-    "clear_notes": handle_clear_notes
+    "apend note tags": handle_add_tags,
+    "create note": handle_add_note,
+    "showing all notes": show_all_notes,
+    "deletion note": handle_delete_note,
+    "clear notes": handle_clear_notes
 }
 
 command_list = ['help', 'hello', 'save', 'add', 'change birthday', "change email", "change phone", 'remove',
                 'info', 'show all', 'set birthday', "set email", 'days to birthday',
-                'delete', "search_note_by_tags", 'search', 'sort', "add_note_tags", "add_note", "show_all_notes", "delete_note", "clear_notes"]
+                'delete', "searching note by tags", 'search', 'sort', "apend note tags", "create note", "showing all notes", 
+                "deletion note", "clear notes"]
 
 custom_style = Style.from_dict({
     'prompt': 'bg:#708090 #ffffff',
