@@ -10,8 +10,8 @@ class Note:
         self.author = author
         self.title = title
         self.note = note
-        self.tags = None
-        self.date = datetime.now().strftime("%d.%m.%Y,%H:%M")
+        self.tags = tags
+        self.date = datetime.now().strftime("%d.%m.%Y,%H:%M") if date is None else date
 
     def change_note(self, field, new_data):
         fields_mapping = {
@@ -82,19 +82,20 @@ class NoteManager:
         print(table)
 
     def search_notes_by_tags(self, search_tags: str):
-        # Користувач вводить через кому теги, ця функція їх розбиває на список
-        # і для кожного тегу провводить пошук по нотатках
-        search_tag_list = [x.strip() for x in search_tags.split(",")]
-        result = set()
-        for note in self.notes:
-            for tag in search_tag_list:
-                if tag in note.tags:
-                    result.add(note)
-        table = PrettyTable(['Author', 'Title', 'Note', 'Tags', 'Date'])
-        table.align = 'l'
-        for data in result:
-            table.add_row([data.author, data.title, data.note, data.tags, data.date])
-        return table
+        if search_tags:
+            search_tag_list = [x.strip() for x in search_tags.split(",")]
+            result = set()
+            for note in self.notes:
+                for tag in search_tag_list:
+                    if tag in note.tags:
+                        result.add(note)
+            table = PrettyTable(['Author', 'Title', 'Note', 'Tags', 'Date'])
+            table.align = 'l'
+            for data in result:
+                table.add_row([data.author, data.title, data.note, data.tags, data.date])
+            return table
+        else:
+            return "Nothing to show"
 
     def save_notes(self):
         with open("notes_save.csv", "w", newline='') as fd:

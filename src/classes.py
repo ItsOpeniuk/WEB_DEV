@@ -98,8 +98,8 @@ class Record:
 
     def edit_phone(self, old_phone, new_phone):
         if any(p.value == old_phone for p in self.phones):
-            self.remove_phone(old_phone)
             self.add_phone(new_phone)
+            self.remove_phone(old_phone)
         else:
             raise ValueError
 

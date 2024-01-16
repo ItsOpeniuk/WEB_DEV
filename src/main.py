@@ -36,33 +36,32 @@ def handle_add(name, phone):
             record.add_phone(phone)
             ADDRESS_BOOK.add_record(record)
 
+            table = PrettyTable(['name', 'phones', 'birthday', 'email'])
+            table.align = 'l'    
+
             answer = input("Would you add birthday or email? (Y/N) - ").lower()
             if answer == "y":
-                data = input("Enter your data separated by space: ").split()
-
+                data = input("Enter birthday and email separated by space (e.g., 01.01.2000 email@example.com): ").split()
+                data.sort()
                 if len(data) == 2:
-                    email, birthday = data
-                    if "@" in email and birthday.count(".") == 2:
-                        handle_set_email(name, email)
-                        handle_set_birthday(name, birthday)
-                        return f"Contact {name} added with phone number {phone}, birthday {birthday}, email {email}"
-                    elif "@" in birthday and email.count(".") == 2:
-                        handle_set_email(name, birthday)
-                        handle_set_birthday(name, email)
-                        return f"Contact {name} added with phone number {phone}, birthday {birthday}, email {email}"
+                    birthday, email  = data
+                    handle_set_email(name, email)
+                    handle_set_birthday(name, birthday)
+                    table.add_row([name, phone, birthday, email])
+                    return table
                 elif len(data) == 1:
                     if "@" in data[0]:
                         handle_set_email(name, data[0])
-                        return f"Contact {name} added with phone number {phone}, email {data[0]}"
+                        table.add_row([name, phone, None, data[0]])
+                        return table
                     elif data[0].count(".") == 2:
-                        handle_set_birthday(name, data[0])
-                        return f"Contact {name} added with phone number {phone}, birthday {data[0]}"
-
+                        table.add_row([name, phone, data[0], None])
+                        return table
                 print("Invalid input.")
             elif answer != "n":
                 print("Invalid input.")
-
-            return f"Contact {name} added with phone number {phone}"
+            table.add_row([name, phone, None, None])
+            return table
         except ValueError:
             return "Invalid phone"
     else:
@@ -182,20 +181,26 @@ def handle_phone(name):
 
 @input_error
 def handle_show_all():
-    if len(ADDRESS_BOOK.data) == 0:
-        raise KeyError
-    else:
-        table = PrettyTable(['name', 'phones', 'birthday', 'email'])
-        table.align = 'l'
-        for name, record in ADDRESS_BOOK.data.items():
-            phones = ''
-            for phone in record.phones:
-                if phone == record.phones[-1]:
-                    phones += str(phone)
-                else:
-                    phones += str(phone) + "\n"
-            table.add_row([name, phones, record.birthday, record.email])
-        return table
+    if not ADDRESS_BOOK.data:
+        return "The address book is empty."
+
+    table = PrettyTable(['Name', 'Phones', 'Birthday', 'Email'])
+    table.align = 'l'
+
+    total_contacts = len(ADDRESS_BOOK.data)
+    
+    for idx, (name, record) in enumerate(ADDRESS_BOOK.data.items()):
+        phones = "\n".join(map(str, record.phones))
+        birthday = record.birthday if record.birthday else ""
+        email = record.email if record.email else ""
+
+        table.add_row([name, phones, birthday, email])
+
+        # Add separator line if it's not the last contact
+        if idx < total_contacts - 1:
+            table.add_row(["-" * 20, "-" * 20, "-" * 20, "-" * 20])
+
+    return str(table)
         
 
 @input_error
@@ -299,6 +304,8 @@ def handle_add_tags(*args):
         if title == note_title:
             match = el
             break
+    else:
+        print("Сould not find note")
     if match:
         NOTES_MANAGER.add_tag(match, tags)
 
@@ -348,7 +355,7 @@ def show_help():
     help_message = """
         hello: Вивести вітальне повідомлення.
         save: Зберегти адресну книгу.
-        add [іʼмя] [телефон]: Додати новий контакт до адресної книги.
+        add [іʼмя] [телефон]: Додати новий контакт до адресної книги або до старого контакту додати номер.
         set email [іʼмя] [email]: Додати email для контакту.
         set birthday [іʼмя] [дата]: Встановити день народження для контакту.
         days to birthday [іʼмя]: Розрахувати кількість днів до наступного дня народження для контакту.
