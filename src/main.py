@@ -185,11 +185,18 @@ def handle_show_all():
     if len(ADDRESS_BOOK.data) == 0:
         raise KeyError
     else:
-        all = []
-        for record in ADDRESS_BOOK.data.values():
-            all.append(str(record))
-        return "\n".join(res for res in all)
-
+        table = PrettyTable(['name', 'phones', 'birthday', 'email'])
+        table.align = 'l'
+        for name, record in ADDRESS_BOOK.data.items():
+            phones = ''
+            for phone in record.phones:
+                if phone == record.phones[-1]:
+                    phones += str(phone)
+                else:
+                    phones += str(phone) + "\n"
+            table.add_row([name, phones, record.birthday, record.email])
+        return table
+        
 
 @input_error
 def handle_search(query):
