@@ -19,6 +19,8 @@ def input_error(func):
             return "Data is already set for this contact"
         except TypeError:
             return "Invalid input. Please check your input."
+        except ValueError:
+            return "Invalid input. Please check your input."
 
     return wrapper
 
@@ -37,14 +39,14 @@ def handle_add(name, phone):
             ADDRESS_BOOK.add_record(record)
 
             table = PrettyTable(['name', 'phones', 'birthday', 'email'])
-            table.align = 'l'    
+            table.align = 'l'
 
             answer = input("Would you add birthday or email? (Y/N) - ").lower()
             if answer == "y":
                 data = input("Enter birthday and email separated by space (e.g., 01.01.2000 email@example.com): ").split()
                 data.sort()
                 if len(data) == 2:
-                    birthday, email  = data
+                    birthday, email = data
                     handle_set_email(name, email)
                     handle_set_birthday(name, birthday)
                     table.add_row([name, phone, birthday, email])
@@ -92,7 +94,7 @@ def handle_change(change, name, new, newphone=None):
         elif change == "phone":
             try:
                 record.edit_phone(new, newphone)
-                return f"Phone number for contact {change} changed to {new}"
+                return f"Phone number for contact {change} changed to {newphone}"
             except ValueError:
                 return "Invalid phone, please enter the phone in XXXXXXXXXX format."
         else:
@@ -188,7 +190,7 @@ def handle_show_all():
     table.align = 'l'
 
     total_contacts = len(ADDRESS_BOOK.data)
-    
+
     for idx, (name, record) in enumerate(ADDRESS_BOOK.data.items()):
         phones = "\n".join(map(str, record.phones))
         birthday = record.birthday if record.birthday else ""
@@ -201,7 +203,7 @@ def handle_show_all():
             table.add_row(["-" * 20, "-" * 20, "-" * 20, "-" * 20])
 
     return str(table)
-        
+
 
 @input_error
 def handle_search(query):
@@ -264,7 +266,7 @@ def handle_add_note(author, title):
     if tag == "y":
         data = input("Enter your data separated by space: ").lower()
         a = data.split()
-        tags = " ".join(a)
+        tags = ", ".join(a)
         all_notes = NOTES_MANAGER.notes
         match = None
         for el in all_notes:
@@ -290,13 +292,13 @@ def handle_delete_note(title):
     if match:
         NOTES_MANAGER.remove_note(match)
     else:
-        print("its note is exist")
+        print("It's note is exist")
 
 
 @input_error
 def handle_add_tags(*args):
     title = args[0]
-    tags = " ".join(args[1:])
+    tags = ", ".join(args[1:])
     all_notes = NOTES_MANAGER.notes
     match = None
     for el in all_notes:
@@ -322,7 +324,7 @@ def handle_show_birthday_list(date):
 
     users_within_range = ""
 
-    for key, value in records.items():
+    for value in records.items():
         try:
             user_birthday = datetime.strptime(
                 str(value.birthday), "%d.%m.%Y").replace(year=date_now.year).date()
@@ -359,6 +361,7 @@ def show_help():
         set email [іʼмя] [email]: Додати email для контакту.
         set birthday [іʼмя] [дата]: Встановити день народження для контакту.
         days to birthday [іʼмя]: Розрахувати кількість днів до наступного дня народження для контакту.
+        show birthday list [дата] : Показати список днів народженя до певної дати
         change phone [іʼмя] [старий телефон] [новий телефон]: Змінити обраний телефон.
         change email/birthday [іʼмя] [нові дані]: Змінити дані існуючого контакту.
         remove [іʼмя] [телефон/birthday/email]: видалити інформацію для контакту.
@@ -367,13 +370,12 @@ def show_help():
         show all: Відобразити всі контакти в адресній книзі.
         search [запит]: Пошук в адресній книзі за символами.
         sort: Сортує необхідну папку.
-        create note [Ім'я] [Назва] : Додає нотатку
-        append note tags [Назва], [Тєг_1, Тєг_2...] : Додає тегу до нотатків
+        create note [автор] [назва] : Додає нотатку
+        append note tags [назва], [тег_1 тег_2...] : Додає тег до нотатків
         showing all notes : Показати усі нотатки
-        deletion note [Назва] : Видаляє нотатки
+        deletion note [назва] : Видаляє нотатку
         clear notes : Видаляє усі нотатки
-        searching note by tags [Тєг_1, Тєг_2...] : Шукати по тєгам
-        show birthday list [дата] : показати список днів народженя до певної дати
+        searching note by tags [тег_1 тег_2...] : Шукати по тєгам
         """
 
     commands = [line.strip()

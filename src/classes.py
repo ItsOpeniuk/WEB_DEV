@@ -66,13 +66,13 @@ class Record:
 
     def set_birthday(self, birthday):
         if self.birthday is not None:
-            raise IndexError 
+            raise IndexError
         else:
             self.birthday = Birthday(birthday)
 
     def set_email(self, email):
         if self.email is not None:
-            raise IndexError 
+            raise IndexError
         else:
             self.email = Email(email)
 
@@ -81,6 +81,8 @@ class Record:
             for ph in self.phones:
                 if ph.value == phone:
                     self.phones.remove(ph)
+                else:
+                    raise ValueError
         else:
             raise IndexError
 
