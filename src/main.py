@@ -260,7 +260,7 @@ def handle_add_note(author, title):
     for note in NOTES_MANAGER.notes:
         if note.title == title:
             print("It's note is exist")
-            break
+            return
     text = input("write your text - ")
     note = Note(author, title, text)
     NOTES_MANAGER.add_note(note)
