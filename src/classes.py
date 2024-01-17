@@ -81,7 +81,8 @@ class Record:
             for ph in self.phones:
                 if ph.value == phone:
                     self.phones.remove(ph)
-                else:
+                    break
+                elif ph not in self.phones:
                     raise ValueError
         else:
             raise IndexError

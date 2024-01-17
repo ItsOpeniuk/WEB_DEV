@@ -196,8 +196,7 @@ def handle_show_all():
         phones = "\n".join(map(str, record.phones))
         birthday = record.birthday if record.birthday else ""
         email = record.email if record.email else ""
-
-        table.add_row([name, phones, birthday, email])
+        table.add_row([name, phones, birthday if birthday != "" else None, email if email != "" else None])
 
         # Add separator line if it's not the last contact
         if idx < total_contacts - 1:
