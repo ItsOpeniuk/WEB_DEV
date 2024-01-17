@@ -93,7 +93,7 @@ class NoteManager:
             table.align = 'l'
             for data in result:
                 table.add_row([data.author, data.title, data.note, data.tags, data.date])
-            return table
+            return table if len(result) != 0 else "Nothing to show"
         else:
             return "Nothing to show"
 

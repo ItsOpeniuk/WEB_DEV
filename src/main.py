@@ -7,6 +7,7 @@ from prompt_toolkit import prompt
 from prompt_toolkit.completion import FuzzyWordCompleter
 from prompt_toolkit.styles import Style
 from prettytable import PrettyTable
+import os
 
 
 def input_error(func):
@@ -227,9 +228,10 @@ def handle_open():
 
 
 @input_error
-def handle_save():
+def handle_save(path_dir):
     global ADDRESS_BOOK
     global NOTES_MANAGER
+    os.chdir(path_dir)
     csv_file = "new_book.csv"
     csv_file_notes = "notes_save.csv"
     if ADDRESS_BOOK.csv_file is None and NOTES_MANAGER.csv_file is None:
@@ -441,11 +443,12 @@ def main():
     global ADDRESS_BOOK
     global NOTES_MANAGER
     handle_open()
+    current_directory = os.getcwd()
 
     while True:
         user_input = get_user_input()
         if user_input in ["good bye", "close", "exit"]:
-            print(handle_save())
+            print(handle_save(current_directory))
             print("Good bye!")
             break
         for command in COMMANDS.keys():
