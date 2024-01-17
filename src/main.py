@@ -57,6 +57,7 @@ def handle_add(name, phone):
                         table.add_row([name, phone, None, data[0]])
                         return table
                     elif data[0].count(".") == 2:
+                        handle_set_birthday(name, data[0])
                         table.add_row([name, phone, data[0], None])
                         return table
                 print("Invalid input.")
@@ -324,7 +325,7 @@ def handle_show_birthday_list(date):
 
     users_within_range = ""
 
-    for value in records.items():
+    for key, value in records.items():
         try:
             user_birthday = datetime.strptime(
                 str(value.birthday), "%d.%m.%Y").replace(year=date_now.year).date()
