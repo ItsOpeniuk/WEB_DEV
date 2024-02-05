@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "home-work-docker"
+version = "0.1.0"
+description = ""
+authors = ["Openiuk <openyusha@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+prompt-toolkit = "^3.0.43"
+prettytable = "^3.9.0"
+setuptools = "^69.0.3"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

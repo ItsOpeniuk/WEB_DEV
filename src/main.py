@@ -1,8 +1,7 @@
 from datetime import datetime
-
-from src.classes import Record, AddressBook
-from src.notes import NoteManager, Note
-from src.sorter import sorter
+from classes import Record, AddressBook
+from notes import NoteManager, Note
+from sorter import sorter
 from prompt_toolkit import prompt
 from prompt_toolkit.completion import FuzzyWordCompleter
 from prompt_toolkit.styles import Style

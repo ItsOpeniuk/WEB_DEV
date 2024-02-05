@@ -11,4 +11,3 @@ setup(
     install_requires=['prettytable', 'prompt_toolkit'],
     entry_points={'console_scripts': ['assistant = src.main:main']}
 )
-

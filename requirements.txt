@@ -1,0 +1,4 @@
+prettytable==3.9.0 ; python_version >= "3.11" and python_version < "4.0"
+prompt-toolkit==3.0.43 ; python_version >= "3.11" and python_version < "4.0"
+setuptools==69.0.3 ; python_version >= "3.11" and python_version < "4.0"
+wcwidth==0.2.13 ; python_version >= "3.11" and python_version < "4.0"
